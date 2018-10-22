@@ -1,4 +1,4 @@
-package com.nekodev.rocketbrowser.rockets
+package com.nekodev.rocketbrowser.rockets.list
 
 import com.nekodev.rocketbrowser.BaseContract
 import com.nekodev.rocketbrowser.api.Rocket
@@ -10,10 +10,12 @@ interface RocketsContract {
         fun showProgress()
         fun hideProgress()
         fun showWelcomeDialog()
+        fun openRocketDetails(rocketId: String)
     }
 
-    interface Presenter : BaseContract.Presenter<RocketsContract.View> {
+    interface Presenter : BaseContract.Presenter<View> {
         fun onShowActiveRocketsCheckedChanged(checked: Boolean)
         fun onRefresh()
+        fun onRocketClicked(rocketId: String)
     }
 }

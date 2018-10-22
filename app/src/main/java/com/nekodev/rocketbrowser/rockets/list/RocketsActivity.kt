@@ -1,4 +1,4 @@
-package com.nekodev.rocketbrowser.rockets
+package com.nekodev.rocketbrowser.rockets.list
 
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.Rocket
+import com.nekodev.rocketbrowser.rockets.details.RocketDetailsActivity
 import com.nekodev.rocketbrowser.util.gone
 import com.nekodev.rocketbrowser.util.show
 import kotlinx.android.synthetic.main.activity_rocket_list.*
@@ -45,7 +46,7 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     override fun showRockets(rockets: List<Rocket>) {
         rocketsRecyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
-            it.adapter = RocketsAdapter(rockets)
+            it.adapter = RocketsAdapter(rockets) { presenter.onRocketClicked(it) }
         }
     }
 
@@ -72,6 +73,10 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
                 }
                 .create()
                 .show()
+    }
+
+    override fun openRocketDetails(rocketId: String) {
+        startActivity(RocketDetailsActivity.createIntent(this, rocketId))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

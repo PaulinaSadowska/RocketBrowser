@@ -1,4 +1,4 @@
-package com.nekodev.rocketbrowser.rockets
+package com.nekodev.rocketbrowser.rockets.list
 
 import android.os.Bundle
 import com.nekodev.rocketbrowser.api.Rocket
@@ -82,6 +82,10 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     private fun showRockets(rockets: List<Rocket>) {
         view?.showRockets(rockets)
+    }
+
+    override fun onRocketClicked(rocketId: String) {
+        view?.openRocketDetails(rocketId)
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
