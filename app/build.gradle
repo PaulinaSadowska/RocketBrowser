@@ -28,7 +28,7 @@ android {
     }
 }
 
-ext{
+ext {
     daggerVersion = '2.17'
     retrofitVersion = '2.4.0'
 }

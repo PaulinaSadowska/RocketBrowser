@@ -21,15 +21,21 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
     private val disposable = CompositeDisposable()
     private var rockets: List<Rocket>? = null
     private var showOnlyActiveRockets = false
+    private var firstLaunch = true
 
     override fun onStateRestored(savedInstanceState: Bundle) {
         rockets = savedInstanceState.getParcelableArrayList(KEY_FETCHED_ROCKETS)
         showOnlyActiveRockets = savedInstanceState.getBoolean(KEY_SHOW_ONLY_ACTIVE_ROCKETS)
+        firstLaunch = false
     }
 
     override fun subscribe(view: RocketsContract.View) {
         this.view = view
         fetchAndShowRockets()
+
+        if(firstLaunch){
+            view.showWelcomeDialog()
+        }
     }
 
     private fun fetchAndShowRockets() {

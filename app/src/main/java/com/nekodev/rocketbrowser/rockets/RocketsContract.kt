@@ -9,6 +9,7 @@ interface RocketsContract {
         fun showError()
         fun showProgress()
         fun hideProgress()
+        fun showWelcomeDialog()
     }
 
     interface Presenter : BaseContract.Presenter<RocketsContract.View> {

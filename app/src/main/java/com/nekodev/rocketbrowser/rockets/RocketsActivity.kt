@@ -1,7 +1,7 @@
 package com.nekodev.rocketbrowser.rockets
 
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.nekodev.rocketbrowser.R
@@ -56,10 +56,21 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun showWelcomeDialog() {
+        AlertDialog.Builder(this)
+                .setMessage(R.string.welcome_to_rocket_browser)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    //do nothing
+                }
+                .create()
+                .show()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         presenter.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
     }
+
     override fun onDestroy() {
         super.onDestroy()
         presenter.unsubscribe()
