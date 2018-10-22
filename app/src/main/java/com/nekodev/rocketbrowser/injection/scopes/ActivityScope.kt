@@ -1,4 +1,4 @@
-package com.nekodev.rocketbrowser.util
+package com.nekodev.rocketbrowser.injection.scopes
 
 import javax.inject.Scope
 

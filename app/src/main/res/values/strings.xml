@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RocketBrowser</string>
+    <string name="show_only_active">Show only active</string>
 </resources>
