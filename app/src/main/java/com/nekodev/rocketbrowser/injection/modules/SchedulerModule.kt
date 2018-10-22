@@ -1,7 +1,7 @@
-package com.nekodev.rocketbrowser.inject
+package com.nekodev.rocketbrowser.injection.modules
 
-import com.nekodev.rocketbrowser.BaseSchedulerProvider
-import com.nekodev.rocketbrowser.SchedulerProvider
+import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
+import com.nekodev.rocketbrowser.util.SchedulerProvider
 import dagger.Binds
 import dagger.Module
 

@@ -1,4 +1,4 @@
-package com.nekodev.rocketbrowser.inject
+package com.nekodev.rocketbrowser.injection.modules
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
