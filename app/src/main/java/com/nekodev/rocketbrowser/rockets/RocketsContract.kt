@@ -14,5 +14,6 @@ interface RocketsContract {
 
     interface Presenter : BaseContract.Presenter<RocketsContract.View> {
         fun onShowActiveRocketsCheckedChanged(checked: Boolean)
+        fun onRefresh()
     }
 }

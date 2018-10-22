@@ -28,7 +28,12 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
         }
         presenter.subscribe(this)
 
+        initializeViews()
+    }
+
+    private fun initializeViews() {
         rocketsActiveSwitch.setOnCheckedChangeListener { _, isChecked -> presenter.onShowActiveRocketsCheckedChanged(isChecked) }
+        rocketsSwipeToRefresh.setOnRefreshListener { presenter.onRefresh() }
     }
 
     private fun injectDependencies() {
@@ -46,10 +51,13 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
 
     override fun showProgress() {
         rocketsProgressBar.show()
+        rocketsSwipeToRefresh.isEnabled = false
     }
 
     override fun hideProgress() {
         rocketsProgressBar.gone()
+        rocketsSwipeToRefresh.isRefreshing = false
+        rocketsSwipeToRefresh.isEnabled = true
     }
 
     override fun showError() {

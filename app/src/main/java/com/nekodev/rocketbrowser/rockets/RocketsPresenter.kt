@@ -33,7 +33,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         this.view = view
         fetchAndShowRockets()
 
-        if(firstLaunch){
+        if (firstLaunch) {
             view.showWelcomeDialog()
         }
     }
@@ -56,12 +56,18 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
     private fun onRocketsFetched(rockets: List<Rocket>) {
         this.rockets = rockets
         view?.hideProgress()
-        showRockets(rockets)
+        showRocketsBaseOnShowActiveFlag(rockets)
+    }
+
+    override fun onRefresh() {
+        rockets = null
+        showRockets(emptyList())
+        fetchAndShowRockets()
     }
 
     override fun onShowActiveRocketsCheckedChanged(checked: Boolean) {
+        this.showOnlyActiveRockets = checked
         rockets?.let {
-            this.showOnlyActiveRockets = checked
             showRocketsBaseOnShowActiveFlag(it)
         }
     }
