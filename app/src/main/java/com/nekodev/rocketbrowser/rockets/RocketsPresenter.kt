@@ -12,18 +12,23 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
                                            private val schedulerProvider: BaseSchedulerProvider)
     : RocketsContract.Presenter {
 
+    companion object {
+        private const val KEY_FETCHED_ROCKETS = "fetchedRockets"
+        private const val KEY_SHOW_ONLY_ACTIVE_ROCKETS = "showOnlyActive"
+    }
+
     private var view: RocketsContract.View? = null
     private val disposable = CompositeDisposable()
     private var rockets: List<Rocket>? = null
     private var showOnlyActiveRockets = false
 
     override fun onStateRestored(savedInstanceState: Bundle) {
-        //do nothing
+        rockets = savedInstanceState.getParcelableArrayList(KEY_FETCHED_ROCKETS)
+        showOnlyActiveRockets = savedInstanceState.getBoolean(KEY_SHOW_ONLY_ACTIVE_ROCKETS)
     }
 
     override fun subscribe(view: RocketsContract.View) {
         this.view = view
-
         fetchAndShowRockets()
     }
 
@@ -35,7 +40,6 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
             disposable.add(service.getRockets()
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
-                    .doFinally { view?.hideProgress() }
                     .subscribeBy(
                             onSuccess = { onRocketsFetched(it) },
                             onError = { view?.showError() }
@@ -45,6 +49,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     private fun onRocketsFetched(rockets: List<Rocket>) {
         this.rockets = rockets
+        view?.hideProgress()
         showRockets(rockets)
     }
 
@@ -68,7 +73,10 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        //do nothing
+        rockets?.let {
+            savedInstanceState.putParcelableArrayList(KEY_FETCHED_ROCKETS, ArrayList(it))
+        }
+        savedInstanceState.putBoolean(KEY_SHOW_ONLY_ACTIVE_ROCKETS, showOnlyActiveRockets)
     }
 
     override fun unsubscribe() {
