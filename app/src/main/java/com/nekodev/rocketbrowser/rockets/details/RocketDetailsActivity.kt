@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import com.nekodev.rocketbrowser.R
 import kotlinx.android.synthetic.main.activity_rocket_details.*
 
-class RocketDetailsActivity : AppCompatActivity() {
+class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
 
     companion object {
         private const val EXTRA_ROCKET_ID = "rocketId"

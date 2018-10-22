@@ -6,6 +6,7 @@ import io.reactivex.Single
 import kotlinx.android.parcel.Parcelize
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface RocketService {
 
@@ -14,6 +15,9 @@ interface RocketService {
 
     @GET("rockets/{rocketId}")
     fun getRocketDetails(@Path("rocketId") rocketId: String): Single<RocketDetails>
+
+    @GET("launches")
+    fun getRocketLaunches(@Query("rocket_id") rocketId: String): Single<List<RocketLaunch>>
 }
 
 @Parcelize
@@ -28,4 +32,9 @@ data class Rocket(val id: Int,
 data class Engines(val number: Int) : Parcelable
 
 @Parcelize
-data class RocketDetails(val id: Int) : Parcelable
+data class RocketDetails(val id: Int,
+                         val description: String) : Parcelable
+
+@Parcelize
+data class RocketLaunch(val id: Int,
+                        val description: String) : Parcelable
