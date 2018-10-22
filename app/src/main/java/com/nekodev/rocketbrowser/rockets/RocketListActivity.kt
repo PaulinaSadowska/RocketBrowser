@@ -1,7 +1,8 @@
-package com.nekodev.rocketbrowser
+package com.nekodev.rocketbrowser.rockets
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.nekodev.rocketbrowser.R
 
 class RocketListActivity : AppCompatActivity() {
 
