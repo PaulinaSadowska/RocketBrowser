@@ -29,8 +29,12 @@ class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickLis
         fun bind(rocket: Rocket) {
             rocketName.text = rocket.name
             rocketCountry.text = rocket.country
-            rocketEnginesCount.text = "Engines: ${rocket.engines.number}"
+            rocketEnginesCount.text = getEnginesLabel(rocket.engines.number)
             containerView.setOnClickListener { itemClickListener.invoke(rocket.rocketId) }
+        }
+
+        private fun getEnginesLabel(enginesCount: Int): String {
+            return containerView.context.resources.getQuantityString(R.plurals.engines_count, enginesCount, enginesCount)
         }
 
     }

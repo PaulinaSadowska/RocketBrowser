@@ -7,6 +7,7 @@ interface RocketsContract {
     interface View {
         fun showRockets(rockets: List<Rocket>)
         fun showError()
+        fun hideError()
         fun showProgress()
         fun hideProgress()
         fun showWelcomeDialog()

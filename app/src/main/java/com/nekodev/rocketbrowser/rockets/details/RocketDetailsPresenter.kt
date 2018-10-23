@@ -1,9 +1,14 @@
 package com.nekodev.rocketbrowser.rockets.details
 
 import android.os.Bundle
+import com.nekodev.rocketbrowser.api.RocketService
+import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
+import javax.inject.Inject
 
-class RocketDetailsPresenter : RocketDetailsContract.Presenter {
-    
+class RocketDetailsPresenter @Inject constructor(private val service: RocketService,
+                                                 private val schedulerProvider: BaseSchedulerProvider)
+    : RocketDetailsContract.Presenter {
+
     override fun onStateRestored(savedInstanceState: Bundle) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

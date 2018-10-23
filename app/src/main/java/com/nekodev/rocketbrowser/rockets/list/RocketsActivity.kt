@@ -8,6 +8,7 @@ import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.Rocket
 import com.nekodev.rocketbrowser.rockets.details.RocketDetailsActivity
+import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
 import com.nekodev.rocketbrowser.util.gone
 import com.nekodev.rocketbrowser.util.show
 import kotlinx.android.synthetic.main.activity_rocket_list.*
@@ -35,6 +36,10 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     private fun initializeViews() {
         rocketsActiveSwitch.setOnCheckedChangeListener { _, isChecked -> presenter.onShowActiveRocketsCheckedChanged(isChecked) }
         rocketsSwipeToRefresh.setOnRefreshListener { presenter.onRefresh() }
+        rocketsRecyclerView.also {
+            it.layoutManager = LinearLayoutManager(this)
+            it.addItemDecoration(ItemOffsetDecoration(this, R.dimen.item_offset))
+        }
     }
 
     private fun injectDependencies() {
@@ -44,10 +49,7 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     }
 
     override fun showRockets(rockets: List<Rocket>) {
-        rocketsRecyclerView.also {
-            it.layoutManager = LinearLayoutManager(this)
-            it.adapter = RocketsAdapter(rockets) { presenter.onRocketClicked(it) }
-        }
+        rocketsRecyclerView.adapter = RocketsAdapter(rockets) { presenter.onRocketClicked(it) }
     }
 
     override fun showProgress() {
@@ -62,7 +64,11 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     }
 
     override fun showError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        errorText.show()
+    }
+
+    override fun hideError() {
+        errorText.gone()
     }
 
     override fun showWelcomeDialog() {

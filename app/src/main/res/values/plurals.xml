@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals
+        name="engines_count">
+        <item quantity="one">%1$d engine</item>
+        <item quantity="other">%1$d engines</item>
+</plurals>
+</resources>

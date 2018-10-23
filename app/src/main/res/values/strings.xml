@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">RocketBrowser</string>
+    <string name="app_name">Rocket Browser</string>
     <string name="show_only_active">Show only active</string>
     <string name="welcome_to_rocket_browser">Welcome to the Rocket Browser</string>
+    <string name="connection_error">Connection error</string>
 </resources>

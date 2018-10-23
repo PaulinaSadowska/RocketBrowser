@@ -46,6 +46,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
             disposable.add(service.getRockets()
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
+                    .doFinally {view?.hideProgress()}
                     .subscribeBy(
                             onSuccess = { onRocketsFetched(it) },
                             onError = { view?.showError() }
@@ -55,12 +56,12 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     private fun onRocketsFetched(rockets: List<Rocket>) {
         this.rockets = rockets
-        view?.hideProgress()
         showRocketsBaseOnShowActiveFlag(rockets)
     }
 
     override fun onRefresh() {
         rockets = null
+        view?.hideError()
         showRockets(emptyList())
         fetchAndShowRockets()
     }
