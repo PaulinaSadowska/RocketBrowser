@@ -51,11 +51,6 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
 
     private fun onLaunchesFetched(launches: List<RocketLaunch>) {
         val launchesAndYears = launches.groupBy { it.launchYear }
-                .flatMap {
-                    mutableListOf<Any>(it.key).apply {
-                        addAll(it.value)
-                    }.toList()
-                }
         view?.displayLaunches(launchesAndYears)
     }
 

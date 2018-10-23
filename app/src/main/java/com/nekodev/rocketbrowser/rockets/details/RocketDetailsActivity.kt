@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
+import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import kotlinx.android.synthetic.main.activity_rocket_details.*
 import javax.inject.Inject
@@ -69,7 +70,7 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
         rocketDescriptionText.text = description
     }
 
-    override fun displayLaunches(launchesAndYears: List<Any>) {
+    override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
