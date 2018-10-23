@@ -8,6 +8,7 @@ import android.view.MenuItem
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
+import kotlinx.android.synthetic.main.activity_rocket_details.*
 import javax.inject.Inject
 
 class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
@@ -62,6 +63,10 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
             setDisplayHomeAsUpEnabled(true)
             setHomeButtonEnabled(true)
         }
+    }
+
+    override fun showDescription(description: String) {
+        rocketDescriptionText.text = description
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
