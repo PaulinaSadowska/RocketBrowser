@@ -2,6 +2,7 @@ package com.nekodev.rocketbrowser.rockets.details
 
 import android.os.Bundle
 import com.nekodev.rocketbrowser.api.RocketDetails
+import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.api.RocketService
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
@@ -25,6 +26,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
         this.view = view
         view.setToolbar(rocketInitData.rocketName)
         fetchRocketDetails()
+        fetchRocketLaunches()
     }
 
     private fun fetchRocketDetails() {
@@ -37,11 +39,36 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
                 ))
     }
 
+    private fun fetchRocketLaunches() {
+        disposable.add(service.getRocketLaunches(rocketInitData.rocketId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeBy(
+                        onSuccess = { onLaunchesFetched(it) },
+                        onError = { onFetchLaunchesError() }
+                ))
+    }
+
+    private fun onLaunchesFetched(launches: List<RocketLaunch>) {
+        val launchesAndYears = launches.groupBy { it.launchYear }
+                .flatMap {
+                    mutableListOf<Any>(it.key).apply {
+                        addAll(it.value)
+                    }.toList()
+                }
+        view?.displayLaunches(launchesAndYears)
+    }
+
+
     private fun onDetailsFetched(rocketDetails: RocketDetails) {
         view?.showDescription(rocketDetails.description)
     }
 
     private fun onFetchDetailsError() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun onFetchLaunchesError() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
