@@ -25,4 +25,4 @@ data class RocketLaunch(@SerializedName("flight_number") val flightNumber: Int,
                         val links: Links,
                         @SerializedName("launch_success") val launchSuccess: Boolean)
 
-data class Links(@SerializedName("mission_path") val missionPath: Int)
+data class Links(@SerializedName("mission_patch_small") val missionPatch: String)

@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.rockets.details.adapter.ViewType
@@ -27,6 +28,11 @@ class RocketLaunchAdapter : ViewTypeDelegateAdapter {
 
         fun bind(rocketLaunch: RocketLaunch) {
             missionNameText.text = rocketLaunch.missionName
+            launchDateText.text = "${rocketLaunch.launchTimestamp}"
+            launchSuccessText.text = if (rocketLaunch.launchSuccess) "success" else "fail"
+            Glide.with(containerView.context)
+                    .load(rocketLaunch.links.missionPatch)
+                    .into(launchPath)
         }
     }
 }
