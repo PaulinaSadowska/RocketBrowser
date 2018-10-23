@@ -81,8 +81,8 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
                 .show()
     }
 
-    override fun openRocketDetails(rocketId: String) {
-        startActivity(RocketDetailsActivity.createIntent(this, rocketId))
+    override fun openRocketDetails(rocketId: String, rocketName: String) {
+        startActivity(RocketDetailsActivity.createIntent(this, rocketId, rocketName))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -46,7 +46,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
             disposable.add(service.getRockets()
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
-                    .doFinally {view?.hideProgress()}
+                    .doFinally { view?.hideProgress() }
                     .subscribeBy(
                             onSuccess = { onRocketsFetched(it) },
                             onError = { view?.showError() }
@@ -85,8 +85,8 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         view?.showRockets(rockets)
     }
 
-    override fun onRocketClicked(rocketId: String) {
-        view?.openRocketDetails(rocketId)
+    override fun onRocketClicked(rocket: Rocket) {
+        view?.openRocketDetails(rocket.rocketId, rocket.name)
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
@@ -98,6 +98,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     override fun unsubscribe() {
         view = null
+        disposable.dispose()
     }
 
 }

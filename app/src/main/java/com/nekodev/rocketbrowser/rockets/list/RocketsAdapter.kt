@@ -9,7 +9,7 @@ import com.nekodev.rocketbrowser.api.Rocket
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_rocket.*
 
-class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickListener: (rocketId: String) -> Unit) : RecyclerView.Adapter<RocketsAdapter.ViewHolder>() {
+class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickListener: (rocket: Rocket) -> Unit) : RecyclerView.Adapter<RocketsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rocket, parent, false)
@@ -24,13 +24,13 @@ class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickLis
         viewHolder.bind(rockets[position])
     }
 
-    class ViewHolder(override val containerView: View, private val itemClickListener: (rocketId: String) -> Unit) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    class ViewHolder(override val containerView: View, private val itemClickListener: (rocket: Rocket) -> Unit) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
         fun bind(rocket: Rocket) {
             rocketName.text = rocket.name
             rocketCountry.text = rocket.country
             rocketEnginesCount.text = getEnginesLabel(rocket.engines.number)
-            containerView.setOnClickListener { itemClickListener.invoke(rocket.rocketId) }
+            containerView.setOnClickListener { itemClickListener.invoke(rocket) }
         }
 
         private fun getEnginesLabel(enginesCount: Int): String {

@@ -11,12 +11,12 @@ interface RocketsContract {
         fun showProgress()
         fun hideProgress()
         fun showWelcomeDialog()
-        fun openRocketDetails(rocketId: String)
+        fun openRocketDetails(rocketId: String, rocketName: String)
     }
 
     interface Presenter : BaseContract.Presenter<View> {
         fun onShowActiveRocketsCheckedChanged(checked: Boolean)
         fun onRefresh()
-        fun onRocketClicked(rocketId: String)
+        fun onRocketClicked(rocket: Rocket)
     }
 }
