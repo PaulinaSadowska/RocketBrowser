@@ -2,4 +2,6 @@
 <resources>
     <dimen name="rocket_item_height">56dp</dimen>
     <dimen name="item_offset">12sp</dimen>
+    <dimen name="mission_patch_size">64dp</dimen>
+    <dimen name="launch_item_offset">1dp</dimen>
 </resources>

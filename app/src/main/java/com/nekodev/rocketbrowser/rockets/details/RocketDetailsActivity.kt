@@ -11,6 +11,7 @@ import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsAdapter
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
+import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
 import kotlinx.android.synthetic.main.activity_rocket_details.*
 import javax.inject.Inject
 
@@ -40,6 +41,11 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
             presenter.onStateRestored(savedInstanceState)
         }
         presenter.subscribe(this)
+
+        launchesRecyclerView.let {
+            it.layoutManager = LinearLayoutManager(this)
+            it.addItemDecoration(ItemOffsetDecoration(this, R.dimen.launch_item_offset))
+        }
     }
 
     private fun prepareAndInjectDependencies() {
@@ -73,10 +79,7 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
     }
 
     override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
-        launchesRecyclerView.let {
-            it.layoutManager = LinearLayoutManager(this)
-            it.adapter = LaunchesAndYearsAdapter(launchesAndYears)
-        }
+        launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
