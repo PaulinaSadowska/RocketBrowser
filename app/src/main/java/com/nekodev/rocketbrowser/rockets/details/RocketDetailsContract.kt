@@ -8,9 +8,10 @@ interface RocketDetailsContract {
         fun setToolbar(rocketName: String)
         fun showDescription(description: String)
         fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>)
+        fun showError()
+        fun showProgress()
+        fun hideProgress()
     }
 
-    interface Presenter : BaseContract.Presenter<View> {
-
-    }
+    interface Presenter : BaseContract.Presenter<View>
 }

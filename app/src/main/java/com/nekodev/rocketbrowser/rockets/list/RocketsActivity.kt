@@ -9,7 +9,7 @@ import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.Rocket
 import com.nekodev.rocketbrowser.rockets.details.RocketDetailsActivity
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
-import com.nekodev.rocketbrowser.util.gone
+import com.nekodev.rocketbrowser.util.hide
 import com.nekodev.rocketbrowser.util.show
 import kotlinx.android.synthetic.main.activity_rocket_list.*
 import javax.inject.Inject
@@ -58,7 +58,7 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     }
 
     override fun hideProgress() {
-        rocketsProgressBar.gone()
+        rocketsProgressBar.hide()
         rocketsSwipeToRefresh.isRefreshing = false
         rocketsSwipeToRefresh.isEnabled = true
     }
@@ -68,7 +68,7 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     }
 
     override fun hideError() {
-        errorText.gone()
+        errorText.hide()
     }
 
     override fun showWelcomeDialog() {

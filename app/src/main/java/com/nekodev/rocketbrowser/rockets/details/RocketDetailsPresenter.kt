@@ -65,9 +65,11 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     private fun fetchLaunches() {
+        view?.showProgress()
         disposable.add(service.getRocketLaunches(rocketInitData.rocketId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
+                .doFinally { view?.hideProgress() }
                 .subscribeBy(
                         onSuccess = { onLaunchesFetched(it) },
                         onError = { onFetchLaunchesError() }
@@ -87,7 +89,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     private fun onFetchLaunchesError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        view?.showError()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {

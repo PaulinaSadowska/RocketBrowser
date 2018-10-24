@@ -13,6 +13,7 @@ import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsAdapter
 import com.nekodev.rocketbrowser.rockets.details.adapter.launch.LaunchDateFormat
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
+import com.nekodev.rocketbrowser.util.hide
 import com.nekodev.rocketbrowser.util.show
 import kotlinx.android.synthetic.main.activity_rocket_details.*
 import javax.inject.Inject
@@ -86,6 +87,18 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
 
     override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
         launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears, dateFormat)
+    }
+
+    override fun showProgress() {
+        launchesProgressBar.show()
+    }
+
+    override fun hideProgress() {
+        launchesProgressBar.hide()
+    }
+
+    override fun showError() {
+        launchesErrorText.show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
