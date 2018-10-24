@@ -3,17 +3,19 @@ package com.nekodev.rocketbrowser.rockets.details.adapter
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.nekodev.rocketbrowser.api.RocketLaunch
+import com.nekodev.rocketbrowser.rockets.details.adapter.launch.LaunchDateFormat
 import com.nekodev.rocketbrowser.rockets.details.adapter.launch.RocketLauchItem
 import com.nekodev.rocketbrowser.rockets.details.adapter.launch.RocketLaunchAdapter
 import com.nekodev.rocketbrowser.rockets.details.adapter.year.YearAdapter
 import com.nekodev.rocketbrowser.rockets.details.adapter.year.YearItem
 
 
-class LaunchesAndYearsAdapter(launchesAndYears: Map<String, List<RocketLaunch>>)
+class LaunchesAndYearsAdapter(launchesAndYears: Map<String, List<RocketLaunch>>,
+                              dateFormat: LaunchDateFormat)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val delegateAdapters: Map<Int, ViewTypeDelegateAdapter> = mapOf(
-            LAUNCH to RocketLaunchAdapter(),
+            LAUNCH to RocketLaunchAdapter(dateFormat),
             YEAR to YearAdapter()
     )
 

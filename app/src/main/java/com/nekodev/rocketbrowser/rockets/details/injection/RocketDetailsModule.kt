@@ -6,7 +6,7 @@ import dagger.Binds
 import dagger.Module
 
 @Module
-interface RocketDetailsModule {
+abstract class RocketDetailsModule {
     @Binds
-    fun getPresenter(presenter: RocketDetailsPresenter): RocketDetailsContract.Presenter
+    abstract fun getPresenter(presenter: RocketDetailsPresenter): RocketDetailsContract.Presenter
 }

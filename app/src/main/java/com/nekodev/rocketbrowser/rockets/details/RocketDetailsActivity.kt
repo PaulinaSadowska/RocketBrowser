@@ -10,6 +10,7 @@ import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsAdapter
+import com.nekodev.rocketbrowser.rockets.details.adapter.launch.LaunchDateFormat
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
 import kotlinx.android.synthetic.main.activity_rocket_details.*
@@ -19,6 +20,9 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
 
     @Inject
     lateinit var presenter: RocketDetailsContract.Presenter
+
+    @Inject
+    lateinit var dateFormat: LaunchDateFormat
 
     companion object {
         private const val EXTRA_ROCKET_ID = "rocketId"
@@ -79,7 +83,7 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
     }
 
     override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
-        launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears)
+        launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears, dateFormat)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

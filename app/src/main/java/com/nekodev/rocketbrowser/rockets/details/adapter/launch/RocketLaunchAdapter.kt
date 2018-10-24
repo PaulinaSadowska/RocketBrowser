@@ -12,10 +12,10 @@ import com.nekodev.rocketbrowser.rockets.details.adapter.ViewTypeDelegateAdapter
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_rocket_launch.*
 
-class RocketLaunchAdapter : ViewTypeDelegateAdapter {
+class RocketLaunchAdapter(private val dateFormat: LaunchDateFormat) : ViewTypeDelegateAdapter {
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rocket_launch, parent, false)
-        return LaunchViewHolder(view)
+        return LaunchViewHolder(view, dateFormat)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, viewType: ViewType) {
@@ -24,11 +24,13 @@ class RocketLaunchAdapter : ViewTypeDelegateAdapter {
         }
     }
 
-    class LaunchViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    class LaunchViewHolder(override val containerView: View,
+                           private val dateFormat: LaunchDateFormat)
+        : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
         fun bind(rocketLaunch: RocketLaunch) {
             missionNameText.text = rocketLaunch.missionName
-            launchDateText.text = "${rocketLaunch.launchTimestamp}"
+            launchDateText.text = dateFormat.format(rocketLaunch.launchTimestamp)
             launchSuccessText.text = if (rocketLaunch.launchSuccess) "success" else "fail"
             Glide.with(containerView.context)
                     .load(rocketLaunch.links.missionPatch)
