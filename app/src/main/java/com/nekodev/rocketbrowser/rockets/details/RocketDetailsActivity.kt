@@ -10,6 +10,7 @@ import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsAdapter
+import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsToViewTypeConverter
 import com.nekodev.rocketbrowser.rockets.details.adapter.launch.LaunchDateFormat
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
@@ -25,6 +26,9 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
 
     @Inject
     lateinit var dateFormat: LaunchDateFormat
+
+    @Inject
+    lateinit var converter: LaunchesAndYearsToViewTypeConverter
 
     companion object {
         private const val EXTRA_ROCKET_ID = "rocketId"
@@ -86,7 +90,7 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
     }
 
     override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
-        launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears, dateFormat)
+        launchesRecyclerView.adapter = LaunchesAndYearsAdapter(launchesAndYears, dateFormat, converter)
     }
 
     override fun showProgress() {
