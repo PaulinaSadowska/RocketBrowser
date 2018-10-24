@@ -1,7 +1,6 @@
 package com.nekodev.rocketbrowser.rockets.details
 
 import android.os.Bundle
-import com.nekodev.rocketbrowser.api.RocketDetails
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.api.RocketService
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
@@ -15,31 +14,57 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
                                                  private val schedulerProvider: BaseSchedulerProvider)
     : RocketDetailsContract.Presenter {
 
+    companion object {
+        private const val KEY_DESCRIPTION = "details"
+        private const val KEY_LAUNCHES = "launches"
+    }
+
     private var view: RocketDetailsContract.View? = null
     private val disposable = CompositeDisposable()
+    private var description: String? = null
+    private var launches: List<RocketLaunch>? = null
 
     override fun onStateRestored(savedInstanceState: Bundle) {
-        //do nothing
+        description = savedInstanceState.getString(KEY_DESCRIPTION)
+        launches = savedInstanceState.getParcelableArrayList(KEY_LAUNCHES)
     }
 
     override fun subscribe(view: RocketDetailsContract.View) {
         this.view = view
         view.setToolbar(rocketInitData.rocketName)
-        fetchRocketDetails()
-        fetchRocketLaunches()
+        showOrFetchDescription()
+        showOrFetchLaunches()
     }
 
-    private fun fetchRocketDetails() {
+    private fun showOrFetchDescription() {
+        description?.let {
+            onDescriptionFetched(it)
+        } ?: run {
+            fetchDescription()
+        }
+    }
+
+    private fun fetchDescription() {
         disposable.add(service.getRocketDetails(rocketInitData.rocketId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = { onDetailsFetched(it) },
-                        onError = { onFetchDetailsError() }
+                        onSuccess = { onDescriptionFetched(it.description) },
+                        onError = {
+                            // do nothing
+                        }
                 ))
     }
 
-    private fun fetchRocketLaunches() {
+    private fun showOrFetchLaunches() {
+        launches?.let {
+            onLaunchesFetched(it)
+        } ?: run {
+            fetchLaunches()
+        }
+    }
+
+    private fun fetchLaunches() {
         disposable.add(service.getRocketLaunches(rocketInitData.rocketId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -50,17 +75,15 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     private fun onLaunchesFetched(launches: List<RocketLaunch>) {
+        this.launches = launches
         val launchesAndYears = launches.groupBy { it.launchYear }
         view?.displayLaunches(launchesAndYears)
     }
 
 
-    private fun onDetailsFetched(rocketDetails: RocketDetails) {
-        view?.showDescription(rocketDetails.description)
-    }
-
-    private fun onFetchDetailsError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun onDescriptionFetched(description: String) {
+        this.description = description
+        view?.showDescription(description)
     }
 
     private fun onFetchLaunchesError() {
@@ -68,7 +91,12 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        //do nothing
+        description?.let {
+            savedInstanceState.putString(KEY_DESCRIPTION, it)
+        }
+        launches?.let {
+            savedInstanceState.putParcelableArrayList(KEY_LAUNCHES, ArrayList(it))
+        }
     }
 
     override fun unsubscribe() {

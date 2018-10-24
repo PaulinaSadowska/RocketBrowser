@@ -13,6 +13,7 @@ import com.nekodev.rocketbrowser.rockets.details.adapter.LaunchesAndYearsAdapter
 import com.nekodev.rocketbrowser.rockets.details.adapter.launch.LaunchDateFormat
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
+import com.nekodev.rocketbrowser.util.show
 import kotlinx.android.synthetic.main.activity_rocket_details.*
 import javax.inject.Inject
 
@@ -80,6 +81,7 @@ class RocketDetailsActivity : AppCompatActivity(), RocketDetailsContract.View {
 
     override fun showDescription(description: String) {
         rocketDescriptionText.text = description
+        rocketDescriptionCard.show()
     }
 
     override fun displayLaunches(launchesAndYears: Map<String, List<RocketLaunch>>) {
