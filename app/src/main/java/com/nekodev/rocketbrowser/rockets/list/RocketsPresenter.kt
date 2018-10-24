@@ -42,16 +42,20 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         rockets?.let {
             showRocketsBaseOnShowActiveFlag(it)
         } ?: run {
-            view?.showProgress()
-            disposable.add(service.getRockets()
-                    .subscribeOn(schedulerProvider.io())
-                    .observeOn(schedulerProvider.ui())
-                    .doFinally { view?.hideProgress() }
-                    .subscribeBy(
-                            onSuccess = { onRocketsFetched(it) },
-                            onError = { view?.showError() }
-                    ))
+            fetchRockets()
         }
+    }
+
+    private fun fetchRockets() {
+        view?.showProgress()
+        disposable.add(service.getRockets()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doFinally { view?.hideProgress() }
+                .subscribeBy(
+                        onSuccess = { onRocketsFetched(it) },
+                        onError = { view?.showError() }
+                ))
     }
 
     private fun onRocketsFetched(rockets: List<Rocket>) {
