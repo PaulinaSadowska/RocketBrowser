@@ -12,6 +12,6 @@ class ItemOffsetDecoration(private val offset: Int) : RecyclerView.ItemDecoratio
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
-        outRect.set(offset, offset, offset, 0)
+        outRect.set(offset, offset, offset, offset)
     }
 }

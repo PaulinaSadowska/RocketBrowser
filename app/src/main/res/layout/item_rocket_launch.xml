@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?selectableItemBackground"
-    app:cardCornerRadius="0dp"
     app:contentPadding="12dp"
     card_view:cardElevation="4dp"
     card_view:cardUseCompatPadding="true">
@@ -29,7 +28,6 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@tools:sample/lorem" />
 
