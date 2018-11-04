@@ -2,6 +2,7 @@ package com.nekodev.rocketbrowser.injection.modules
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.nekodev.rocketbrowser.api.RocketService
 import dagger.Module
@@ -28,6 +29,7 @@ class NetworkModule {
         return Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
     }

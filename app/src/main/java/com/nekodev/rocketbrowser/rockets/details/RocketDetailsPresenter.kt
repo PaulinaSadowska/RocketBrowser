@@ -1,12 +1,14 @@
 package com.nekodev.rocketbrowser.rockets.details
 
 import android.os.Bundle
+import com.nekodev.rocketbrowser.api.RocketDetails
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.api.RocketService
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
 import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class RocketDetailsPresenter @Inject constructor(private val service: RocketService,
@@ -23,6 +25,8 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     private val disposable = CompositeDisposable()
     private var description: String? = null
     private var launches: List<RocketLaunch>? = null
+
+    private var fetchDetailsJob: Job? = null
 
     override fun onStateRestored(savedInstanceState: Bundle) {
         description = savedInstanceState.getString(KEY_DESCRIPTION)
@@ -45,15 +49,21 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     private fun fetchDescription() {
-        disposable.add(service.getRocketDetails(rocketInitData.rocketId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { onDescriptionFetched(it.description) },
-                        onError = {
-                            // do nothing
-                        }
-                ))
+        try {
+            fetchDetailsJob = CoroutineScope(Dispatchers.IO).launch {
+                val details = getDetails()
+                withContext(Dispatchers.Main) {
+                    onDescriptionFetched(details.description)
+                }
+            }
+        } catch (e: Exception) {
+            //do nothing
+        }
+
+    }
+
+    private suspend fun getDetails(): RocketDetails {
+        return service.getRocketDetails(rocketInitData.rocketId).await()
     }
 
     private fun showOrFetchLaunches() {
@@ -104,6 +114,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     override fun unsubscribe() {
         view = null
         disposable.dispose()
+        fetchDetailsJob?.cancel()
     }
 
 }
