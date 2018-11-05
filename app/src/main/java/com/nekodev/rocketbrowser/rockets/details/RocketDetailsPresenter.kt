@@ -1,6 +1,7 @@
 package com.nekodev.rocketbrowser.rockets.details
 
 import android.os.Bundle
+import android.util.Log
 import com.nekodev.rocketbrowser.api.RocketDetails
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.api.RocketService
@@ -10,11 +11,15 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class RocketDetailsPresenter @Inject constructor(private val service: RocketService,
                                                  private val rocketInitData: RocketInitData,
                                                  private val schedulerProvider: BaseSchedulerProvider)
-    : RocketDetailsContract.Presenter {
+    : RocketDetailsContract.Presenter, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     companion object {
         private const val KEY_DESCRIPTION = "details"
@@ -26,7 +31,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     private var description: String? = null
     private var launches: List<RocketLaunch>? = null
 
-    private var fetchDetailsJob: Job? = null
+    private lateinit var job: Job
 
     override fun onStateRestored(savedInstanceState: Bundle) {
         description = savedInstanceState.getString(KEY_DESCRIPTION)
@@ -35,6 +40,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
 
     override fun subscribe(view: RocketDetailsContract.View) {
         this.view = view
+        job = Job()
         view.setToolbar(rocketInitData.rocketName)
         showOrFetchDescription()
         showOrFetchLaunches()
@@ -49,17 +55,25 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     }
 
     private fun fetchDescription() {
-        try {
-            fetchDetailsJob = CoroutineScope(Dispatchers.IO).launch {
+        launch {
+            try {
+                log("fetch")
                 val details = getDetails()
+                delay(5000)
+                log("fetched")
                 withContext(Dispatchers.Main) {
+                    log("show")
                     onDescriptionFetched(details.description)
                 }
+            } catch (e: Exception) {
+                //jobCancellationException
+                log("error ${e.localizedMessage} ${e.javaClass.simpleName}")
             }
-        } catch (e: Exception) {
-            //do nothing
         }
+    }
 
+    private fun log(message: String) {
+        Log.d("RocketDetailsPresenter", "[${Thread.currentThread()}] $message")
     }
 
     private suspend fun getDetails(): RocketDetails {
@@ -114,7 +128,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
     override fun unsubscribe() {
         view = null
         disposable.dispose()
-        fetchDetailsJob?.cancel()
+        job.cancel()
     }
 
 }
