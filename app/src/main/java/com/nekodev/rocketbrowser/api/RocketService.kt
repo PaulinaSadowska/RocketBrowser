@@ -15,5 +15,5 @@ interface RocketService {
     fun getRocketDetails(@Path("rocketId") rocketId: String): Deferred<RocketDetails>
 
     @GET("launches")
-    fun getRocketLaunches(@Query("rocket_id") rocketId: String): Single<List<RocketLaunch>>
+    fun getRocketLaunches(@Query("rocket_id") rocketId: String): Deferred<List<RocketLaunch>>
 }
