@@ -3,22 +3,24 @@ package com.nekodev.rocketbrowser.rockets.list
 import android.os.Bundle
 import com.nekodev.rocketbrowser.api.Rocket
 import com.nekodev.rocketbrowser.api.RocketService
-import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
-class RocketsPresenter @Inject constructor(private val service: RocketService,
-                                           private val schedulerProvider: BaseSchedulerProvider)
-    : RocketsContract.Presenter {
+class RocketsPresenter @Inject constructor(private val service: RocketService)
+    : RocketsContract.Presenter, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     companion object {
         private const val KEY_FETCHED_ROCKETS = "fetchedRockets"
         private const val KEY_SHOW_ONLY_ACTIVE_ROCKETS = "showOnlyActive"
     }
 
+    private lateinit var job: Job
+
     private var view: RocketsContract.View? = null
-    private val disposable = CompositeDisposable()
     private var rockets: List<Rocket>? = null
     private var showOnlyActiveRockets = false
     private var firstLaunch = true
@@ -31,43 +33,48 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     override fun subscribe(view: RocketsContract.View) {
         this.view = view
-        fetchAndShowRockets()
+        job = Job()
 
         if (firstLaunch) {
             view.showWelcomeDialog()
         }
+
+        fetchRocketsIfShouldAndShow()
     }
 
-    private fun fetchAndShowRockets() {
+    private fun fetchRocketsIfShouldAndShow() {
         rockets?.let {
             showRocketsBaseOnShowActiveFlag(it)
         } ?: run {
-            fetchRockets()
+            fetchAndShowRockets()
         }
     }
 
-    private fun fetchRockets() {
+    private fun fetchAndShowRockets() {
         view?.showProgress()
-        disposable.add(service.getRockets()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .doFinally { view?.hideProgress() }
-                .subscribeBy(
-                        onSuccess = { onRocketsFetched(it) },
-                        onError = { view?.showError() }
-                ))
+        launch {
+            try {
+                val rockets = fetchRockets()
+                withContext(Dispatchers.Main) {
+                    showRocketsBaseOnShowActiveFlag(rockets)
+                }
+            } catch (e: Exception) {
+                view?.showError()
+            } finally {
+                withContext(Dispatchers.Main) {
+                    view?.hideProgress()
+                }
+            }
+        }
     }
 
-    private fun onRocketsFetched(rockets: List<Rocket>) {
-        this.rockets = rockets
-        showRocketsBaseOnShowActiveFlag(rockets)
-    }
+    private suspend fun fetchRockets() = service.getRockets().await()
 
     override fun onRefresh() {
         rockets = null
         view?.hideError()
         showRockets(emptyList())
-        fetchAndShowRockets()
+        fetchRocketsIfShouldAndShow()
     }
 
     override fun onShowActiveRocketsCheckedChanged(checked: Boolean) {
@@ -78,6 +85,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
     }
 
     private fun showRocketsBaseOnShowActiveFlag(rockets: List<Rocket>) {
+        this.rockets = rockets
         if (showOnlyActiveRockets) {
             showRockets(rockets.filter { it.active })
         } else {
@@ -102,7 +110,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
 
     override fun unsubscribe() {
         view = null
-        disposable.dispose()
+        job.cancel()
     }
 
 }

@@ -83,7 +83,6 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
                 onFetchLaunchesError()
             }
         }
-
     }
 
     private suspend fun fetchAndShowLaunches() {
