@@ -5,7 +5,6 @@ import com.nekodev.rocketbrowser.api.RocketDetails
 import com.nekodev.rocketbrowser.api.RocketLaunch
 import com.nekodev.rocketbrowser.api.RocketService
 import com.nekodev.rocketbrowser.rockets.details.injection.RocketInitData
-import com.nekodev.rocketbrowser.util.log
 import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -57,8 +56,7 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
                     onDescriptionFetched(details.description)
                 }
             } catch (e: Exception) {
-                //jobCancellationException
-                log("error ${e.localizedMessage} ${e.javaClass.simpleName}")
+                //do nothing
             }
         }
     }
@@ -80,17 +78,23 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
         view?.showProgress()
         launch {
             try {
-                val fetchedLaunches = getRocketLaunches()
-                withContext(Dispatchers.Main) {
-                    processAndShowLaunches(fetchedLaunches)
-                }
+                fetchAndShowLaunches()
             } catch (e: Exception) {
-                log("error :((( ${e.localizedMessage} ${e.javaClass.simpleName}")
                 onFetchLaunchesError()
             }
         }
 
     }
+
+    private suspend fun fetchAndShowLaunches() {
+        val fetchedLaunches = getRocketLaunches()
+        withContext(Dispatchers.Main) {
+            processAndShowLaunches(fetchedLaunches)
+        }
+    }
+
+    private suspend fun getRocketLaunches() =
+            service.getRocketLaunches(rocketInitData.rocketId).await()
 
     private fun processAndShowLaunches(fetchedLaunches: List<RocketLaunch>) {
         launches = fetchedLaunches
@@ -98,9 +102,6 @@ class RocketDetailsPresenter @Inject constructor(private val service: RocketServ
         view?.displayLaunches(launchesAndYears)
         view?.hideProgress()
     }
-
-    private suspend fun getRocketLaunches() =
-            service.getRocketLaunches(rocketInitData.rocketId).await()
 
 
     private fun onDescriptionFetched(description: String) {
