@@ -24,12 +24,16 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
         setContentView(R.layout.activity_rocket_list)
 
         injectDependencies()
+        lifecycle.addObserver(presenter.scope)
 
         savedInstanceState?.let {
             presenter.onStateRestored(savedInstanceState)
         }
-        presenter.subscribe(this)
+    }
 
+    override fun onStart() {
+        super.onStart()
+        presenter.subscribe(this)
         initializeViews()
     }
 

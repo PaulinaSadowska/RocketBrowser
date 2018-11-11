@@ -1,29 +1,27 @@
 package com.nekodev.rocketbrowser.rockets.list
 
 import android.os.Bundle
+import com.nekodev.rocketbrowser.MainScope
 import com.nekodev.rocketbrowser.api.Rocket
 import com.nekodev.rocketbrowser.api.RocketService
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class RocketsPresenter @Inject constructor(private val service: RocketService)
-    : RocketsContract.Presenter, CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO + job
+    : RocketsContract.Presenter {
 
     companion object {
         private const val KEY_FETCHED_ROCKETS = "fetchedRockets"
         private const val KEY_SHOW_ONLY_ACTIVE_ROCKETS = "showOnlyActive"
     }
 
-    private lateinit var job: Job
-
     private var view: RocketsContract.View? = null
     private var rockets: List<Rocket>? = null
     private var showOnlyActiveRockets = false
     private var firstLaunch = true
+    override val scope = MainScope()
 
     override fun onStateRestored(savedInstanceState: Bundle) {
         rockets = savedInstanceState.getParcelableArrayList(KEY_FETCHED_ROCKETS)
@@ -31,9 +29,9 @@ class RocketsPresenter @Inject constructor(private val service: RocketService)
         firstLaunch = false
     }
 
+
     override fun subscribe(view: RocketsContract.View) {
         this.view = view
-        job = Job()
 
         if (firstLaunch) {
             view.showWelcomeDialog()
@@ -52,7 +50,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService)
 
     private fun fetchAndShowRockets() {
         view?.showProgress()
-        launch {
+        scope.launch {
             try {
                 val rockets = fetchRockets()
                 withContext(Dispatchers.Main) {
@@ -110,7 +108,5 @@ class RocketsPresenter @Inject constructor(private val service: RocketService)
 
     override fun unsubscribe() {
         view = null
-        job.cancel()
     }
-
 }

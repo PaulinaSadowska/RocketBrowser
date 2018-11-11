@@ -8,5 +8,5 @@ import dagger.Module
 @Module
 interface RocketsModule {
     @Binds
-    fun getPresenter(presenter: RocketsPresenter): RocketsContract.Presenter
+    fun bindPresenter(presenter: RocketsPresenter): RocketsContract.Presenter
 }
