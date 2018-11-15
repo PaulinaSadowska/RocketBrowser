@@ -33,8 +33,28 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         this.view = view
         fetchAndShowRockets()
 
+        disposable.add(view.showActiveChecked()
+                .subscribeBy(
+                        onNext = { checked -> onShowActiveRocketsCheckedChanged(checked) }
+                ))
+        disposable.add(view.onRefresh()
+                .subscribeBy(
+                        onNext = { refresh() }
+                ))
+        disposable.add(view.onRocketClicked()
+                .subscribeBy(
+                        onNext = { openRocketDetails(it) }
+                ))
+
         if (firstLaunch) {
             view.showWelcomeDialog()
+        }
+    }
+
+    private fun onShowActiveRocketsCheckedChanged(checked: Boolean) {
+        this.showOnlyActiveRockets = checked
+        rockets?.let {
+            showRocketsBaseOnShowActiveFlag(it)
         }
     }
 
@@ -63,18 +83,11 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         showRocketsBaseOnShowActiveFlag(rockets)
     }
 
-    override fun onRefresh() {
+    private fun refresh() {
         rockets = null
         view?.hideError()
         showRockets(emptyList())
         fetchAndShowRockets()
-    }
-
-    override fun onShowActiveRocketsCheckedChanged(checked: Boolean) {
-        this.showOnlyActiveRockets = checked
-        rockets?.let {
-            showRocketsBaseOnShowActiveFlag(it)
-        }
     }
 
     private fun showRocketsBaseOnShowActiveFlag(rockets: List<Rocket>) {
@@ -89,7 +102,7 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         view?.showRockets(rockets)
     }
 
-    override fun onRocketClicked(rocket: Rocket) {
+    private fun openRocketDetails(rocket: Rocket) {
         view?.openRocketDetails(rocket.rocketId, rocket.name)
     }
 

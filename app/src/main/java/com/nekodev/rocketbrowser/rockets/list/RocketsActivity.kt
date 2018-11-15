@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
+import com.jakewharton.rxbinding2.widget.RxCompoundButton
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.RocketApplication
 import com.nekodev.rocketbrowser.api.Rocket
@@ -11,6 +13,7 @@ import com.nekodev.rocketbrowser.rockets.details.RocketDetailsActivity
 import com.nekodev.rocketbrowser.util.ItemOffsetDecoration
 import com.nekodev.rocketbrowser.util.hide
 import com.nekodev.rocketbrowser.util.show
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_rocket_list.*
 import javax.inject.Inject
 
@@ -19,11 +22,15 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     @Inject
     lateinit var presenter: RocketsContract.Presenter
 
+    private lateinit var adapter: RocketsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rocket_list)
 
         injectDependencies()
+        adapter = RocketsAdapter()
+        rocketsRecyclerView.adapter = adapter
 
         savedInstanceState?.let {
             presenter.onStateRestored(savedInstanceState)
@@ -34,12 +41,18 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
     }
 
     private fun initializeViews() {
-        rocketsActiveSwitch.setOnCheckedChangeListener { _, isChecked -> presenter.onShowActiveRocketsCheckedChanged(isChecked) }
-        rocketsSwipeToRefresh.setOnRefreshListener { presenter.onRefresh() }
         rocketsRecyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
             it.addItemDecoration(ItemOffsetDecoration(this, R.dimen.item_offset))
         }
+    }
+
+    override fun showActiveChecked(): Observable<Boolean> {
+        return RxCompoundButton.checkedChanges(rocketsActiveSwitch)
+    }
+
+    override fun onRefresh(): Observable<Any> {
+        return RxSwipeRefreshLayout.refreshes(rocketsSwipeToRefresh)
     }
 
     private fun injectDependencies() {
@@ -48,8 +61,12 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
                 .inject(this)
     }
 
+    override fun onRocketClicked(): Observable<Rocket> {
+        return adapter.clickEvent
+    }
+
     override fun showRockets(rockets: List<Rocket>) {
-        rocketsRecyclerView.adapter = RocketsAdapter(rockets) { presenter.onRocketClicked(it) }
+        adapter.showRockets(rockets)
     }
 
     override fun showProgress() {

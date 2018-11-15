@@ -6,14 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import com.nekodev.rocketbrowser.R
 import com.nekodev.rocketbrowser.api.Rocket
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_rocket.*
+import java.util.*
 
-class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickListener: (rocket: Rocket) -> Unit) : RecyclerView.Adapter<RocketsAdapter.ViewHolder>() {
+class RocketsAdapter : RecyclerView.Adapter<RocketsAdapter.ViewHolder>() {
+
+    private val rockets: MutableList<Rocket> = ArrayList()
+
+    private val clickSubject = PublishSubject.create<Rocket>()
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rocket, parent, false)
-        return ViewHolder(view, itemClickListener)
+        return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
@@ -24,13 +31,23 @@ class RocketsAdapter(private val rockets: List<Rocket>, private val itemClickLis
         viewHolder.bind(rockets[position])
     }
 
-    class ViewHolder(override val containerView: View, private val itemClickListener: (rocket: Rocket) -> Unit) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    fun showRockets(rockets: List<Rocket>) {
+        this.rockets.clear()
+        this.rockets.addAll(rockets)
+        notifyDataSetChanged()
+    }
+
+    val clickEvent: Observable<Rocket> = clickSubject
+
+    inner class ViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
         fun bind(rocket: Rocket) {
             rocketName.text = rocket.name
             rocketCountry.text = rocket.country
             rocketEnginesCount.text = getEnginesLabel(rocket.engines.number)
-            containerView.setOnClickListener { itemClickListener.invoke(rocket) }
+            itemView.setOnClickListener {
+                clickSubject.onNext(rocket)
+            }
         }
 
         private fun getEnginesLabel(enginesCount: Int): String {

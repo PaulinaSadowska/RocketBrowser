@@ -2,6 +2,7 @@ package com.nekodev.rocketbrowser.rockets.list
 
 import com.nekodev.rocketbrowser.BaseContract
 import com.nekodev.rocketbrowser.api.Rocket
+import io.reactivex.Observable
 
 interface RocketsContract {
     interface View {
@@ -12,11 +13,11 @@ interface RocketsContract {
         fun hideProgress()
         fun showWelcomeDialog()
         fun openRocketDetails(rocketId: String, rocketName: String)
+
+        fun showActiveChecked(): Observable<Boolean>
+        fun onRefresh(): Observable<Any>
+        fun onRocketClicked(): Observable<Rocket>
     }
 
-    interface Presenter : BaseContract.Presenter<View> {
-        fun onShowActiveRocketsCheckedChanged(checked: Boolean)
-        fun onRefresh()
-        fun onRocketClicked(rocket: Rocket)
-    }
+    interface Presenter : BaseContract.Presenter<View>
 }
