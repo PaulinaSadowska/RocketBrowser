@@ -11,7 +11,7 @@ interface RocketsContract {
         fun hideError()
         fun showProgress()
         fun hideProgress()
-        fun showWelcomeDialog()
+        fun showWelcomeDialog(visitsCount: Int)
         fun openRocketDetails(rocketId: String, rocketName: String)
 
         fun showActiveChecked(): Observable<Boolean>

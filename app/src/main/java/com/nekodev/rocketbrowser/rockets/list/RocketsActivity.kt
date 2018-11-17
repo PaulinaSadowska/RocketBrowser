@@ -88,9 +88,10 @@ class RocketsActivity : AppCompatActivity(), RocketsContract.View {
         errorText.hide()
     }
 
-    override fun showWelcomeDialog() {
+    override fun showWelcomeDialog(visitsCount: Int) {
+        val welcomeMessage = getString(R.string.welcome_to_rocket_browser)
         AlertDialog.Builder(this)
-                .setMessage(R.string.welcome_to_rocket_browser)
+                .setMessage("$welcomeMessage $visitsCount")
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     //do nothing
                 }

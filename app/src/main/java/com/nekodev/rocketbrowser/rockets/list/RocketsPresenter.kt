@@ -3,13 +3,18 @@ package com.nekodev.rocketbrowser.rockets.list
 import android.os.Bundle
 import com.nekodev.rocketbrowser.api.Rocket
 import com.nekodev.rocketbrowser.api.RocketService
+import com.nekodev.rocketbrowser.database.VisitDao
+import com.nekodev.rocketbrowser.database.VisitLog
 import com.nekodev.rocketbrowser.util.BaseSchedulerProvider
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class RocketsPresenter @Inject constructor(private val service: RocketService,
-                                           private val schedulerProvider: BaseSchedulerProvider)
+                                           private val schedulerProvider: BaseSchedulerProvider,
+                                           private val visitDao: VisitDao)
     : RocketsContract.Presenter {
 
     companion object {
@@ -32,14 +37,31 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
     override fun subscribe(view: RocketsContract.View) {
         this.view = view
         fetchAndShowRockets()
+        addRefreshDisposable(view)
+        disposable.add(
+                Completable.fromCallable {
+                    visitDao.save(VisitLog(System.currentTimeMillis()))
+                }
+                        .subscribeOn(schedulerProvider.io())
+                        .observeOn(schedulerProvider.ui())
+                        .subscribeBy(
+                                onError = {}
+                        )
+        )
+
+        disposable.add(visitDao.getAllVisits()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .map { it.size }
+                .subscribeBy(
+                        onSuccess = { view.showWelcomeDialog(it) },
+                        onError = { }
+                )
+        )
 
         disposable.add(view.showActiveChecked()
                 .subscribeBy(
                         onNext = { checked -> onShowActiveRocketsCheckedChanged(checked) }
-                ))
-        disposable.add(view.onRefresh()
-                .subscribeBy(
-                        onNext = { refresh() }
                 ))
         disposable.add(view.onRocketClicked()
                 .subscribeBy(
@@ -47,8 +69,42 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
                 ))
 
         if (firstLaunch) {
-            view.showWelcomeDialog()
+
         }
+    }
+
+    private fun addRefreshDisposable(view: RocketsContract.View) {
+        disposable.add(view.onRefresh()
+                .doOnNext {
+                    rockets = null
+                    view.hideError()
+                    showRockets(emptyList())
+                }
+                .switchMapSingle { getFetchRocketsSingle() }
+                .subscribeBy(
+                        onNext = { onRocketsFetched(it) },
+                        onError = { view.showError() }
+                ))
+    }
+
+    private fun fetchAndShowRockets() {
+        rockets?.let {
+            showRocketsBaseOnShowActiveFlag(it)
+        } ?: run {
+            disposable.add(getFetchRocketsSingle()
+                    .subscribeBy(
+                            onSuccess = { onRocketsFetched(it) },
+                            onError = { view?.showError() }
+                    ))
+        }
+    }
+
+    private fun getFetchRocketsSingle(): Single<List<Rocket>> {
+        return service.getRockets()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnSubscribe { view?.showProgress() }
+                .doFinally { view?.hideProgress() }
     }
 
     private fun onShowActiveRocketsCheckedChanged(checked: Boolean) {
@@ -58,36 +114,10 @@ class RocketsPresenter @Inject constructor(private val service: RocketService,
         }
     }
 
-    private fun fetchAndShowRockets() {
-        rockets?.let {
-            showRocketsBaseOnShowActiveFlag(it)
-        } ?: run {
-            fetchRockets()
-        }
-    }
-
-    private fun fetchRockets() {
-        view?.showProgress()
-        disposable.add(service.getRockets()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .doFinally { view?.hideProgress() }
-                .subscribeBy(
-                        onSuccess = { onRocketsFetched(it) },
-                        onError = { view?.showError() }
-                ))
-    }
 
     private fun onRocketsFetched(rockets: List<Rocket>) {
         this.rockets = rockets
         showRocketsBaseOnShowActiveFlag(rockets)
-    }
-
-    private fun refresh() {
-        rockets = null
-        view?.hideError()
-        showRockets(emptyList())
-        fetchAndShowRockets()
     }
 
     private fun showRocketsBaseOnShowActiveFlag(rockets: List<Rocket>) {
